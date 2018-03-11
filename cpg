@@ -1,0 +1,47 @@
+#! /bin/bash
+
+if [ ! -d ~/.cpg ]; then
+  mkdir ~/.cpg
+  cat << EOS > ~/.cpg/Makefile
+all:
+	g++ -std=gnu++1y a.cc -lm
+EOS
+
+  cat << EOS2 > ~/.cpg/a.cc
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <queue>
+#include <cstdio>
+#include <cmath>
+#include <utility>
+
+using namespace std;
+
+using ll = long long;
+using p = pair<ll, ll>;
+
+int main(void) {
+  
+  return 0;
+}
+EOS2
+fi
+
+MAKEFILE=~/.cpg/Makefile
+CXX=~/.cpg/a.cc
+
+dir=`pwd`
+name=$1
+
+if [ -z $name ]; then
+  echo "cpg contest-name"
+  exit 1
+fi
+
+for i in a b c d e f g h i j; do
+  d=$dir/$name/$i
+  mkdir -p $d
+  cp $MAKEFILE $d/
+  cp $CXX $d/
+done
