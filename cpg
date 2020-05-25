@@ -3,8 +3,44 @@
 if [ ! -d ~/.cpg ]; then
   mkdir ~/.cpg
   cat << EOS > ~/.cpg/Makefile
-all:
+all: build test
+build:
 	g++ -std=gnu++1y a.cc -lm
+test
+	bash t.sh
+EOS
+
+  cat << EOS > ~/.cpg/t.sh
+#! /bin/bash
+
+for i in `seq 10000`
+do
+  t=tests/test$i
+  a=tests/ans$i
+  if [ ! -f $t ]; then
+    exit
+  fi
+
+  echo "test$i"
+  cat $t
+
+  echo
+  echo "-----"
+
+  expect=`cat $a`
+  echo expected answer:
+  echo $expect
+  
+  actual=`./a.out < "$t"`
+  echo actual answer:
+  echo $actual
+
+  if [ ! -z "$actual" ] && [ "$expect" = "$actual" ]; then
+    echo -e '\e[32mok\e[m'
+  else
+    echo -e '\e[31mFAIL\e[m'
+  fi
+done
 EOS
 
   cat << EOS2 > ~/.cpg/a.cc
@@ -30,6 +66,7 @@ fi
 
 MAKEFILE=~/.cpg/Makefile
 CXX=~/.cpg/a.cc
+T=~/.cpg/t.sh
 
 dir=`pwd`
 name=$1
@@ -41,7 +78,12 @@ fi
 
 for i in a b c d e f g h i j; do
   d=$dir/$name/$i
-  mkdir -p $d
+  mkdir -p $d/tests
+  for j in `seq 3`; do
+    touch $d/tests/test$j
+    touch $d/tests/ans$j
+  done
   cp $MAKEFILE $d/
   cp $CXX $d/
+  cp $T $d/
 done
